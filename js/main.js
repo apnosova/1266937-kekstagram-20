@@ -297,6 +297,7 @@ effectPin.addEventListener('mouseup', function () {
 
 
 // Валидация хеш-тегов
+// хэш-теги необязательны
 
 var form = document.querySelector('.img-upload__form');
 
@@ -312,23 +313,35 @@ hashtagInput.addEventListener('input', function () {
   var MAX_HASHTAGS = 5;
   var MAX_SYMBOLS = 20;
   var MIN_SYMBOLS = 2;
+  var uniqueHashtags = [];
 
   for (var i = 0; i < hashtags.length; i++) {
     var reHashtag = /^#[\wa-яё]+$/i;
     var isHashtag = reHashtag.test(hashtags[i]);
 
-    // хэш-теги необязательны
     if (!isHashtag || hashtags[i].length < MIN_SYMBOLS) {
       hashtagInput.setCustomValidity('Хэш-тег начинается с символа # и не может состоять только из одной #. Строка после решётки должна состоять только из букв, чисел и символа подчеркивания. Хэш-теги разделяются пробелами.');
       form.reportValidity();
-    } else if (hashtags[i].length > MAX_SYMBOLS) {
+    } else {
+      hashtagInput.setCustomValidity('');
+    }
+  }
+
+  for (var k = 0; k < hashtags.length; k++) {
+    if (hashtags[k].length > MAX_SYMBOLS) {
       hashtagInput.setCustomValidity('Максимальная длина одного хэш-тега 20 симв.');
       form.reportValidity();
-    } else if (hashtags.indexOf(hashtags[i].toLowerCase()) > -1) {
+    }
+  }
+
+  for (var j = 0; j < hashtags.length; j++) {
+    var hashtag = hashtags[j].toLowerCase();
+    var isDblValue = uniqueHashtags.indexOf(hashtag) !== -1;
+    if (isDblValue) {
       hashtagInput.setCustomValidity('Один и тот же хэш-тег не может быть использован дважды');
       form.reportValidity();
     } else {
-      hashtagInput.setCustomValidity('');
+      uniqueHashtags.push(hashtag);
     }
   }
 
@@ -337,5 +350,3 @@ hashtagInput.addEventListener('input', function () {
     form.reportValidity();
   }
 });
-
-

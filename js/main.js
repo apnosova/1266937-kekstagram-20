@@ -132,20 +132,92 @@ addPictures();
 
 // заполнение элемента .big-picture информацией из первого элемента массива с данными
 var fullPicture = document.querySelector('.big-picture');
-// fullPicture.classList.remove('hidden');
+var fullPictureClose = fullPicture.querySelector('.big-picture__cancel');
 
-fullPicture.querySelector('.big-picture__img').src = fullPicture.url;
-fullPicture.querySelector('.social__likes').textContent = fullPicture.likes;
-fullPicture.querySelector('.comments-count').textContent = fullPicture.comments;
-fullPicture.querySelector('.social__caption').textContent = fullPicture.description;
+var renderFullPicture = function () {
+  fullPicture.querySelector('.big-picture__img').src = fullPicture.url;
+  fullPicture.querySelector('.social__likes').textContent = fullPicture.likes;
+  fullPicture.querySelector('.comments-count').textContent = fullPicture.comments;
+  fullPicture.querySelector('.social__caption').textContent = fullPicture.description;
+
+  return fullPicture;
+};
+
+renderFullPicture();
 
 // Спрячьте блоки счётчика комментариев .social__comment-count и загрузки новых комментариев .comments-loader, добавив им класс hidden
 fullPicture.querySelector('.social__comment-count').classList.add('hidden');
 fullPicture.querySelector('.comments-loader').classList.add('hidden');
 
-// Добавьте на <body> класс modal-open, чтобы контейнер с фотографиями позади не прокручивался при скролле
-// document.querySelector('body').classList.add('modal-open');
+// Возможность просмотра любой фотографии в полноразмерном режиме
+var thumbnails = picturesList.querySelectorAll('.picture__img');
+var fullPhoto = fullPicture.querySelector('img');
+var thumbnailLinks = picturesList.querySelectorAll('.picture');
 
+var openFullPhoto = function () {
+  fullPicture.classList.remove('hidden');
+  document.addEventListener('keydown', onFullPhotoEscPress);
+  // Контейнер с фотографиями не прокручивается при скролле
+  document.querySelector('body').classList.add('modal-open');
+};
+
+
+var onThumbnailClick = function (thumbnailLink, photo, description) {
+  thumbnailLink.addEventListener('click', function (evt) {
+    // отменить переход по ссылке
+    evt.preventDefault();
+    fullPhoto.src = photo;
+    fullPhoto.alt = description;
+    openFullPhoto();
+  });
+};
+
+var enlargeThumbnailOnClick = function () {
+  for (var i = 0; i < thumbnailLinks.length; i++) {
+    onThumbnailClick(thumbnailLinks[i], thumbnails[i].src, thumbnails[i].alt);
+  }
+};
+
+enlargeThumbnailOnClick();
+
+
+// Выбранная фотография открывается в полноразмерном режиме при нажатии на клавишу Enter
+var onThumbnailEnterPress = function (thumbnailLink, photo, description) {
+  thumbnailLink.addEventListener('keydown', function (evt) {
+    if (evt.key === 'Enter') {
+      evt.preventDefault();
+      fullPhoto.src = photo;
+      fullPhoto.alt = description;
+      openFullPhoto();
+    }
+  });
+};
+
+var enlargeThumbnailOnEnter = function () {
+  for (var i = 0; i < thumbnailLinks.length; i++) {
+    onThumbnailEnterPress(thumbnailLinks[i], thumbnails[i].src, thumbnails[i].alt);
+  }
+};
+
+enlargeThumbnailOnEnter();
+
+// Закрытие окна полноразмерного просмотра по нажатию клавиши Esc и клике по иконке закрытия
+var onFullPhotoEscPress = function (evt) {
+  if (evt.key === 'Escape') {
+    evt.preventDefault();
+    closeFullPhoto();
+  }
+};
+
+var closeFullPhoto = function () {
+  fullPicture.classList.add('hidden');
+  document.querySelector('body').classList.remove('modal-open');
+};
+
+fullPictureClose.addEventListener('click', function () {
+  closeFullPhoto();
+  document.removeEventListener('keydown', onFullPhotoEscPress);
+});
 
 // Загрузка изображения и показ формы редактирования
 
@@ -197,40 +269,35 @@ uploadCancel.addEventListener('click', function () {
 
 // Редактирование размера изображения
 
-var buttonMinus = edit.querySelector('.scale__control--smaller');
-var buttonPlus = edit.querySelector('.scale__control--bigger');
+var buttonScale = edit.querySelector('.img-upload__scale');
+
 var scaleInput = edit.querySelector('.scale__control--value');
 var preview = edit.querySelector('.img-upload__preview');
 
-var increaseScale = function () {
+var onScaleClick = function (evt) {
   var STEP = 25;
   var MAX_COUNT = 100;
-  var count = parseInt(scaleInput.value, 10) + STEP;
-  if (count <= MAX_COUNT) {
-    scaleInput.value = count + ' % ';
-    var scale = count / 100;
-    preview.style.transform = 'scale(' + scale + ')';
-  }
-};
-
-var decreaseScale = function () {
-  var STEP = 25;
   var MIN_COUNT = 25;
-  var count = parseInt(scaleInput.value, 10) - STEP;
-  if (count >= MIN_COUNT) {
-    scaleInput.value = count + ' % ';
-    var scale = count / 100;
-    preview.style.transform = 'scale(' + scale + ')';
+
+  if (evt.target && evt.target.matches('.scale__control--bigger')) {
+    var countPlus = parseInt(scaleInput.value, 10) + STEP;
+    if (countPlus <= MAX_COUNT) {
+      scaleInput.value = countPlus + ' % ';
+      var scalePlus = countPlus / 100;
+      preview.style.transform = 'scale(' + scalePlus + ')';
+    }
+  } else if (evt.target && evt.target.matches('.scale__control--smaller')) {
+    var countMinus = parseInt(scaleInput.value, 10) - STEP;
+    if (countMinus >= MIN_COUNT) {
+      scaleInput.value = countMinus + ' % ';
+      var scaleMinus = countMinus / 100;
+      preview.style.transform = 'scale(' + scaleMinus + ')';
+    }
   }
 };
 
-buttonPlus.addEventListener('click', function () {
-  increaseScale();
-});
+buttonScale.addEventListener('click', onScaleClick);
 
-buttonMinus.addEventListener('click', function () {
-  decreaseScale();
-});
 
 // Применение эффекта для изображения
 // Применение эффекта для изображения полностью программировать в этом задании не нужно.
@@ -348,5 +415,24 @@ hashtagInput.addEventListener('input', function () {
   if (hashtags.length > MAX_HASHTAGS) {
     hashtagInput.setCustomValidity('Нельзя указать больше пяти хэш-тегов.');
     form.reportValidity();
+  }
+
+  if (!hashtagInput.value) {
+    hashtagInput.setCustomValidity('');
+    return;
+  }
+});
+
+// Валидация комментариев
+commentInput.addEventListener('input', function () {
+  var MAX_SYMBOLS = 140;
+  if (commentInput.value.length > MAX_SYMBOLS) {
+    commentInput.setCustomValidity('Длина комментария не может составлять больше 140 симв.');
+    form.reportValidity();
+  }
+
+  if (!commentInput.value) {
+    commentInput.setCustomValidity('');
+    return;
   }
 });

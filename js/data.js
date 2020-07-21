@@ -1,6 +1,6 @@
 'use strict';
 
-window.data = (function () {
+(function () {
 
   var MESSAGES = [
     'Всё отлично!',
@@ -23,7 +23,7 @@ window.data = (function () {
     'Ксения'
   ];
 
-  return {
+  window.data = {
     MESSAGES: MESSAGES,
     NAMES: NAMES,
   };

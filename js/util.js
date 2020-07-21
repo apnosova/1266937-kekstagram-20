@@ -1,8 +1,8 @@
 'use strict';
 
-window.util = (function () {
+(function () {
 
-  return {
+  window.util = {
     // функция генерации случайного целого числа, max и min включаются
     getRandomIntInclusive: function (min, max) {
       min = Math.ceil(min);

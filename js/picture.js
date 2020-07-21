@@ -1,7 +1,7 @@
 'use strict';
 
 // Модуль для отрисовки миниатюры
-window.util = (function () {
+(function () {
 
   var commentsList = document.querySelector('.social__comments');
   var commentTemplate = document.querySelector('.social__comment');

@@ -1,7 +1,7 @@
 'use strict';
 
 // Модуль для работы с формой редактирования изображения
-window.util = (function () {
+(function () {
 
   // Загрузка изображения и показ формы редактирования
   var uploadFile = document.querySelector('#upload-file');

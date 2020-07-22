@@ -87,7 +87,6 @@
   var previewImage = preview.querySelector('img');
   // Значение по умолчанию
   previewImage.classList.add('effects__preview--none');
-  var effectPin = edit.querySelector('.effect-level__pin');
   var effectLevel = edit.querySelector('.effect-level__value');
   var slider = edit.querySelector('.img-upload__effect-level');
 
@@ -102,30 +101,82 @@
     } else {
       slider.classList.remove('hidden');
     }
-    // При переключении эффектов, уровень насыщенности сбрасывается до начального значения (100%): слайдер, CSS-стиль изображения и значение поля должны обновляться
+
     if (selectedEffect === 'effects__preview--chrome') {
       previewImage.style.filter = 'grayscale(100)';
-      effectLevel.value = 100;
     } else if (selectedEffect === 'effects__preview--sepia') {
       previewImage.style.filter = 'sepia(1)';
-      effectLevel.value = 100;
     } else if (selectedEffect === 'effects__preview--marvin') {
       previewImage.style.filter = 'invert(100%)';
-      effectLevel.value = 100;
     } else if (selectedEffect === 'effects__preview--phobos') {
       previewImage.style.filter = 'blur(3px)';
-      effectLevel.value = 100;
     } else if (selectedEffect === 'effects__preview--heat') {
       previewImage.style.filter = 'brightness(3)';
+    }
+
+    // При переключении эффектов, уровень насыщенности сбрасывается до начального значения (100%): слайдер, CSS-стиль изображения и значение поля должны обновляться
+    if (evt.target) {
       effectLevel.value = 100;
+      pin.style.left = 453 + 'px';
+      effectDepth.style.width = 453 + 'px';
     }
   };
 
   effectsList.addEventListener('change', onEffectChange);
 
-  effectPin.addEventListener('mouseup', function () {
+  // Слайдер
+
+  var pin = document.querySelector('.effect-level__pin');
+  var line = document.querySelector('.effect-level__line');
+  var effectDepth = document.querySelector('.effect-level__depth');
+
+  // Начальное значение 100%
+  pin.style.left = 453 + 'px';
+  effectDepth.style.width = 453 + 'px';
+
+  pin.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+    // предотвратить запуск выделения
+
+    var shiftX = evt.clientX - pin.getBoundingClientRect().left;
+    // shiftY здесь не нужен, слайдер двигается только по горизонтали
+
+    var onMouseMove = function (moveEvt) {
+      var newLeft = moveEvt.clientX - shiftX - line.getBoundingClientRect().left;
+
+      // курсор вышел из слайдера => оставить бегунок в его границах.
+      if (newLeft < 0) {
+        newLeft = 0;
+      }
+      var rightEdge = line.offsetWidth;
+      if (newLeft > rightEdge) {
+        newLeft = rightEdge;
+      }
+
+      pin.style.left = newLeft + 'px';
+      effectDepth.style.width = newLeft + 'px';
+
+      applyEffect();
+    };
+
+    var onMouseUp = function () {
+      document.removeEventListener('mouseup', onMouseUp);
+      document.removeEventListener('mousemove', onMouseMove);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+
+  pin.addEventListener('dragstart', function () {
+    return false;
+  });
+
+  // Наложение эффекта на изображение
+  var applyEffect = function () {
     var LINE_WIDTH = 453;
-    effectLevel.value = Math.round(effectPin.offsetLeft / LINE_WIDTH * 100);
+
+    effectLevel.value = Math.round(pin.offsetLeft / LINE_WIDTH * 100);
     if (previewImage.classList.contains('effects__preview--chrome')) {
       previewImage.style.filter = 'grayscale(' + effectLevel.value / 100;
     }
@@ -141,7 +192,7 @@
     if (previewImage.classList.contains('effects__preview--heat')) {
       previewImage.style.filter = 'brightness(' + effectLevel.value / 100 * 3;
     }
-  });
+  };
 
 
   // Валидация хеш-тегов

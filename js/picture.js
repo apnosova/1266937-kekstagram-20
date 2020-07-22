@@ -2,26 +2,16 @@
 
 // Модуль для отрисовки миниатюры
 (function () {
+  var MAX_PICTURES = 25;
+  var MAX_COMMENTS = 5;
 
   var commentsList = document.querySelector('.social__comments');
   var commentTemplate = document.querySelector('.social__comment');
   var picturesList = document.querySelector('.pictures');
   var pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
 
-  // функция для создания списка комментариев
-  var getCommentsArray = function () {
-    var comments = [];
-    for (var i = 0; i < window.util.getRandomIntInclusive(0, 10); i++) {
-      comments.push({
-        avatar: 'img/avatar-' + window.util.getRandomIntInclusive(1, 6) + '.svg',
-        message: window.util.getRandomElementfromArray(window.data.MESSAGES),
-        name: window.util.getRandomElementfromArray(window.data.NAMES)
-      });
-    }
-    return comments;
-  };
-
   // функция создания DOM-элемента на основе JS-объекта
+
   var renderComment = function (comment) {
     var commentElement = commentTemplate.cloneNode(true);
 
@@ -32,31 +22,6 @@
     return commentElement;
   };
 
-  // функция заполнения блока DOM-элементами на основе массива JS-объектов
-  var addComments = function () {
-    var fragment = document.createDocumentFragment();
-    var comments = getCommentsArray();
-    for (var i = 0; i < comments.length; i++) {
-      fragment.appendChild(renderComment(comments[i]));
-    }
-    commentsList.appendChild(fragment);
-  };
-
-  // функция для создания массива фотографий из 25 сгенерированных JS-объектов
-  var getPicturesArray = function () {
-    var pictures = [];
-    var MAX_PICTURES = 25;
-    for (var i = 1; i <= MAX_PICTURES; i++) {
-      pictures.push({
-        url: 'photos/' + i + '.jpg',
-        description: '',
-        likes: window.util.getRandomIntInclusive(15, 200),
-        comments: getCommentsArray().length
-      });
-      window.util.shuffle(pictures);
-    }
-    return pictures;
-  };
 
   // функция для создания массива комментариев из сгенерированных JS-объектов
   var renderPicture = function (picture) {
@@ -64,22 +29,39 @@
 
     pictureElement.querySelector('.picture__img').src = picture.url;
     pictureElement.querySelector('.picture__likes').textContent = picture.likes;
-    pictureElement.querySelector('.picture__comments').textContent = picture.comments;
+    pictureElement.querySelector('.picture__comments').textContent = picture.comments.length;
 
     return pictureElement;
   };
 
   // функция заполнения блока DOM-элементами на основе массива JS-объектов
-  var addPictures = function () {
+  var renderPictures = function (pictures) {
     var fragment = document.createDocumentFragment();
-    var pictures = getPicturesArray();
 
-    for (var i = 0; i < pictures.length; i++) {
+
+    window.util.shuffle(pictures);
+    for (var i = 0; i < MAX_PICTURES; i++) {
       fragment.appendChild(renderPicture(pictures[i]));
+
     }
+
     picturesList.appendChild(fragment);
+
   };
 
-  addComments();
-  addPictures();
+  // функция заполнения блока DOM-элементами на основе массива JS-объектов
+  var renderComments = function (comments) {
+    var fragment = document.createDocumentFragment();
+
+    for (var i = 0; i < MAX_COMMENTS; i++) {
+      fragment.appendChild(renderComment(comments[i]));
+    }
+
+    commentsList.appendChild(fragment);
+  };
+
+  window.backend.load(function (data) {
+    renderComments(data);
+    renderPictures(data);
+  }, function () {});
 })();

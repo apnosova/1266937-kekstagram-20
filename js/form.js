@@ -11,12 +11,17 @@
   var commentInput = edit.querySelector('.text__description');
   var hashtagInput = edit.querySelector('.text__hashtags');
 
+  var effectLevel = document.querySelector('.effect-level__value');
+  var effectDepth = document.querySelector('.effect-level__depth');
+  var pin = document.querySelector('.effect-level__pin');
+
+  // var effectLevel = document.querySelector('.effect-level__value');
+
   var onEditEscPress = function (evt) {
     if (commentInput === document.activeElement || hashtagInput === document.activeElement) {
       return;
-    } else if (evt.key === 'Escape') {
-      evt.preventDefault();
-      closeEdit();
+    } else {
+      window.util.isEscEvent(evt, closeEdit);
     }
   };
 
@@ -24,9 +29,11 @@
     edit.classList.remove('hidden');
     document.querySelector('body').classList.add('modal-open');
     document.addEventListener('keydown', onEditEscPress);
-    // Значения по умолчанию
+    // Дуфолтные значения
     scaleInput.value = 100 + ' % ';
     preview.style.transform = 'scale(1)';
+    effectLevel.value = 100;
+    effectDepth.style.width = 453 + 'px';
   };
 
   var closeEdit = function () {
@@ -34,9 +41,14 @@
     document.querySelector('body').classList.remove('modal-open');
     document.removeEventListener('keydown', onEditEscPress);
     uploadFile.value = '';
+    // Дефолтные значения
     // эффект сбрасывается на «Оригинал»
-    previewImage.className = 'effects__preview--none';
-
+    previewImage.className = 'none';
+    previewImage.style.filter = '';
+    pin.style.left = 453 + 'px';
+    effectDepth.style.width = 453 + 'px';
+    effectLevel.value = 100;
+    scaleInput.value = 100 + ' % ';
     // поля для ввода хэш-тегов и комментария очищаются
     hashtagInput.value = '';
     commentInput.value = '';
@@ -56,6 +68,7 @@
 
   var scaleInput = edit.querySelector('.scale__control--value');
   var preview = edit.querySelector('.img-upload__preview');
+  var previewImage = preview.querySelector('img');
 
   var onScaleClick = function (evt) {
     var STEP = 25;
@@ -81,134 +94,15 @@
 
   buttonScale.addEventListener('click', onScaleClick);
 
-  // Применение эффекта для изображения
-
-  var effectsList = edit.querySelector('.img-upload__effects');
-  var previewImage = preview.querySelector('img');
-  // Значение по умолчанию
-  previewImage.classList.add('effects__preview--none');
-  var effectLevel = edit.querySelector('.effect-level__value');
-  var slider = edit.querySelector('.img-upload__effect-level');
-
-  // Добавление класса выбранного эффекта на превью
-  var onEffectChange = function (evt) {
-    var selectedEffect = 'effects__preview--' + evt.target.value;
-    previewImage.className = selectedEffect;
-    // При выборе эффекта «Оригинал» слайдер скрывается.
-    if (selectedEffect === 'effects__preview--none') {
-      slider.classList.add('hidden');
-      previewImage.style.filter = '';
-    } else {
-      slider.classList.remove('hidden');
-    }
-
-    if (selectedEffect === 'effects__preview--chrome') {
-      previewImage.style.filter = 'grayscale(100)';
-    } else if (selectedEffect === 'effects__preview--sepia') {
-      previewImage.style.filter = 'sepia(1)';
-    } else if (selectedEffect === 'effects__preview--marvin') {
-      previewImage.style.filter = 'invert(100%)';
-    } else if (selectedEffect === 'effects__preview--phobos') {
-      previewImage.style.filter = 'blur(3px)';
-    } else if (selectedEffect === 'effects__preview--heat') {
-      previewImage.style.filter = 'brightness(3)';
-    }
-
-    // При переключении эффектов, уровень насыщенности сбрасывается до начального значения (100%): слайдер, CSS-стиль изображения и значение поля должны обновляться
-    if (evt.target) {
-      effectLevel.value = 100;
-      pin.style.left = 453 + 'px';
-      effectDepth.style.width = 453 + 'px';
-    }
-  };
-
-  effectsList.addEventListener('change', onEffectChange);
-
-  // Слайдер
-
-  var pin = document.querySelector('.effect-level__pin');
-  var line = document.querySelector('.effect-level__line');
-  var effectDepth = document.querySelector('.effect-level__depth');
-
-  // Начальное значение 100%
-  pin.style.left = 453 + 'px';
-  effectDepth.style.width = 453 + 'px';
-
-  pin.addEventListener('mousedown', function (evt) {
-    evt.preventDefault();
-    // предотвратить запуск выделения
-
-    var shiftX = evt.clientX - pin.getBoundingClientRect().left;
-    // shiftY здесь не нужен, слайдер двигается только по горизонтали
-
-    var onMouseMove = function (moveEvt) {
-      var newLeft = moveEvt.clientX - shiftX - line.getBoundingClientRect().left;
-
-      // курсор вышел из слайдера => оставить бегунок в его границах.
-      if (newLeft < 0) {
-        newLeft = 0;
-      }
-      var rightEdge = line.offsetWidth;
-      if (newLeft > rightEdge) {
-        newLeft = rightEdge;
-      }
-
-      pin.style.left = newLeft + 'px';
-      effectDepth.style.width = newLeft + 'px';
-
-      applyEffect();
-    };
-
-    var onMouseUp = function () {
-      document.removeEventListener('mouseup', onMouseUp);
-      document.removeEventListener('mousemove', onMouseMove);
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  });
-
-  pin.addEventListener('dragstart', function () {
-    return false;
-  });
-
-  // Наложение эффекта на изображение
-  var applyEffect = function () {
-    var LINE_WIDTH = 453;
-
-    effectLevel.value = Math.round(pin.offsetLeft / LINE_WIDTH * 100);
-    if (previewImage.classList.contains('effects__preview--chrome')) {
-      previewImage.style.filter = 'grayscale(' + effectLevel.value / 100;
-    }
-    if (previewImage.classList.contains('effects__preview--sepia')) {
-      previewImage.style.filter = 'sepia(' + effectLevel.value / 100;
-    }
-    if (previewImage.classList.contains('effects__preview--marvin')) {
-      previewImage.style.filter = 'invert(' + effectLevel.value + '%) ';
-    }
-    if (previewImage.classList.contains('effects__preview--phobos')) {
-      previewImage.style.filter = 'blur(' + effectLevel.value / 100 * 3 + 'px';
-    }
-    if (previewImage.classList.contains('effects__preview--heat')) {
-      previewImage.style.filter = 'brightness(' + effectLevel.value / 100 * 3;
-    }
-  };
-
 
   // Валидация хеш-тегов
   // хэш-теги необязательны
 
   var form = document.querySelector('.img-upload__form');
 
-  // Функция разбивает строку на массив строк
-  var splitString = function (stringToSplit, separator) {
-    var arrayOfStrings = stringToSplit.split(separator);
-
-    return arrayOfStrings;
-  };
 
   hashtagInput.addEventListener('input', function () {
-    var hashtags = splitString(hashtagInput.value, ' ');
+    var hashtags = window.util.splitString(hashtagInput.value, ' ');
     var MAX_HASHTAGS = 5;
     var MAX_SYMBOLS = 20;
     var MIN_SYMBOLS = 2;
@@ -217,6 +111,11 @@
     for (var i = 0; i < hashtags.length; i++) {
       var reHashtag = /^#[\wa-яё]+$/i;
       var isHashtag = reHashtag.test(hashtags[i]);
+
+      if (!hashtagInput.value) {
+        hashtagInput.setCustomValidity('');
+        return;
+      }
 
       if (!isHashtag || hashtags[i].length < MIN_SYMBOLS) {
         hashtagInput.setCustomValidity('Хэш-тег начинается с символа # и не может состоять только из одной #. Строка после решётки должна состоять только из букв, чисел и символа подчеркивания. Хэш-теги разделяются пробелами.');
@@ -247,11 +146,6 @@
       hashtagInput.setCustomValidity('Нельзя указать больше пяти хэш-тегов.');
       form.reportValidity();
     }
-
-    if (!hashtagInput.value) {
-      hashtagInput.setCustomValidity('');
-      return;
-    }
   });
 
   // Валидация комментариев
@@ -267,4 +161,85 @@
       return;
     }
   });
+
+
+  // Обработчик отправки формы отменяет действие по умолчанию и отправляет данные на сервер
+  var onFormSubmit = function (evt) {
+    evt.preventDefault();
+    window.backend.upload(new FormData(form), onSuccess, onError);
+    closeEdit();
+  };
+
+  form.addEventListener('submit', onFormSubmit);
+
+  // Если отправка данных прошла успешно, показывается соответствующее сообщение
+  var onSuccess = function () {
+    var successTemplate = document.querySelector('#success').content.querySelector('.success');
+    var successElement = successTemplate.cloneNode(true);
+
+    document.querySelector('main').appendChild(successElement);
+
+    var successButton = document.querySelector('.success__button');
+
+    var closeSuccessMessage = function () {
+      successElement.remove();
+      document.removeEventListener('keydown', onSuccessMessageEscPress);
+      document.removeEventListener('click', onDocumentSuccessClick);
+    };
+
+    successButton.addEventListener('click', function () {
+      closeSuccessMessage();
+    });
+
+    // по нажатию на клавишу Esc и по клику на произвольную область экрана
+    var onSuccessMessageEscPress = function (evt) {
+      window.util.isEscEvent(evt, closeSuccessMessage);
+    };
+
+    document.addEventListener('keydown', onSuccessMessageEscPress);
+
+    var onDocumentSuccessClick = function (evt) {
+      if (evt.target.className !== 'success__inner') {
+        closeSuccessMessage();
+      }
+    };
+
+    document.addEventListener('click', onDocumentSuccessClick);
+  };
+
+
+  // Если при отправке данных произошла ошибка запроса, нужно показать соответствующее сообщение
+  var onError = function () {
+    var errorTemplate = document.querySelector('#error').content.querySelector('.error');
+    var errorElement = errorTemplate.cloneNode(true);
+
+    document.querySelector('main').appendChild(errorElement);
+
+    var errorButton = document.querySelector('.error__button');
+
+    var closeErrorMessage = function () {
+      errorElement.remove();
+      document.removeEventListener('keydown', onErrorMessageEscPress);
+      document.removeEventListener('click', onDocumentErrorClick);
+    };
+
+    errorButton.addEventListener('click', function () {
+      closeErrorMessage();
+    });
+
+    // по нажатию на клавишу Esc и по клику на произвольную область экрана
+    var onErrorMessageEscPress = function (evt) {
+      window.util.isEscEvent(evt, closeErrorMessage);
+    };
+
+    document.addEventListener('keydown', onErrorMessageEscPress);
+
+    var onDocumentErrorClick = function (evt) {
+      if (evt.target.className !== 'error__inner') {
+        closeErrorMessage();
+      }
+    };
+
+    document.addEventListener('click', onDocumentErrorClick);
+  };
 })();

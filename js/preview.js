@@ -2,7 +2,7 @@
 // Модуль для отрисовки увеличенного изображения
 
 (function () {
-// Просмотр загруженных изображений
+  // Просмотр загруженных изображений
 
   // заполнение элемента .big-picture информацией из первого элемента массива с данными
   var fullPicture = document.querySelector('.big-picture');
@@ -17,8 +17,6 @@
     return fullPicture;
   };
 
-  renderFullPicture();
-
   // Спрячьте блоки счётчика комментариев .social__comment-count и загрузки новых комментариев .comments-loader, добавив им класс hidden
   fullPicture.querySelector('.social__comment-count').classList.add('hidden');
   fullPicture.querySelector('.comments-loader').classList.add('hidden');
@@ -26,7 +24,7 @@
   // Возможность просмотра любой фотографии в полноразмерном режиме
   var thumbnails = document.querySelectorAll('.picture__img');
   var fullPhoto = fullPicture.querySelector('img');
-  var thumbnailLinks = document.querySelectorAll('.picture');
+  var thumbnailLinks = document.querySelectorAll('a.picture');
 
   var openFullPhoto = function () {
     fullPicture.classList.remove('hidden');
@@ -52,7 +50,8 @@
     }
   };
 
-  enlargeThumbnailOnClick();
+  // enlargeThumbnailOnClick();
+
 
   // Выбранная фотография открывается в полноразмерном режиме при нажатии на клавишу Enter
   var onThumbnailEnterPress = function (thumbnailLink, photo, description) {
@@ -84,11 +83,17 @@
 
   var closeFullPhoto = function () {
     fullPicture.classList.add('hidden');
-    document.querySelector('body').classList.remove('modal-open');
+    document.body.classList.remove('modal-open');
   };
 
   fullPictureClose.addEventListener('click', function () {
     closeFullPhoto();
     document.removeEventListener('keydown', onFullPhotoEscPress);
   });
+
+  window.preview = {
+    renderFullPicture: renderFullPicture,
+    openFullPhoto: openFullPhoto,
+    enlargeThumbnailOnClick: enlargeThumbnailOnClick,
+  };
 })();

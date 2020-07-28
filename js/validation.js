@@ -23,11 +23,11 @@
     }
 
     for (var i = 0; i < hashtags.length; i++) {
-      var reHashtag = /^#[\wa-яё]+$/i;
+      var reHashtag = /^#[A-ZА-ЯЁ0-9]+$/i;
       var isHashtag = reHashtag.test(hashtags[i]);
 
       if (!isHashtag || hashtags[i].length < MIN_HASHTAG_SYMBOLS) {
-        hashtagInput.setCustomValidity('Хэш-тег начинается с символа # и не может состоять только из одной #. Строка после решётки должна состоять только из букв, чисел и символа подчеркивания. Хэш-теги разделяются пробелами.');
+        hashtagInput.setCustomValidity('Хэш-тег начинается с символа # и не может состоять только из одной #. Строка после решётки должна состоять только из букв, чисел и символа подчеркивания. Хэш-теги разделяются одним пробелом.');
         hashtagInput.style.boxShadow = 'inset 0 0 0 5px red';
         return;
       } else {

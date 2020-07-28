@@ -78,7 +78,6 @@
     fullPicture.description = picture.description;
     commentsList.innerHTML = '';
     renderFullPicture(picture);
-    renderComments(comments);
     displayedComments = picture.comments.slice();
     renderComments(displayedComments);
     displayedComments.splice(0, MAX_COMMENTS);

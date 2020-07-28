@@ -11,8 +11,11 @@
   var pin = document.querySelector('.effect-level__pin');
   var line = document.querySelector('.effect-level__line');
   var effectDepth = document.querySelector('.effect-level__depth');
+  var defaultEffect = document.querySelector('input[id=effect-none]');
+
 
   var classNameToEffect = {
+    'effects__preview--none': '',
     'effects__preview--chrome': 'grayscale(100)',
     'effects__preview--sepia': 'sepia(1)',
     'effects__preview--marvin': 'invert(100%)',
@@ -20,18 +23,22 @@
     'effects__preview--heat': 'brightness(3)',
   };
 
-  // Добавление класса выбранного эффекта на превью
-  var onEffectChange = function (evt) {
-    var selectedEffect = 'effects__preview--' + evt.target.value;
-    previewImage.className = selectedEffect;
-
-    // При выборе эффекта «Оригинал» слайдер скрывается.
-    if (selectedEffect === 'effects__preview--none') {
+  // При выборе эффекта «Оригинал» слайдер скрывается
+  var addDefaultEffect = function () {
+    if (defaultEffect.checked) {
       slider.classList.add('hidden');
       previewImage.style.filter = '';
     } else {
       slider.classList.remove('hidden');
     }
+  };
+
+  // Добавление класса выбранного эффекта на превью
+  var onEffectChange = function (evt) {
+    var selectedEffect = 'effects__preview--' + evt.target.value;
+    previewImage.className = selectedEffect;
+
+    addDefaultEffect();
 
     previewImage.style.filter = classNameToEffect[selectedEffect];
 
@@ -105,7 +112,12 @@
       previewImage.style.filter = 'blur(' + effectLevel.value / 100 * 3 + 'px';
     }
     if (previewImage.classList.contains('effects__preview--heat')) {
-      previewImage.style.filter = 'brightness(' + effectLevel.value / 100 * 3;
+      previewImage.style.filter = 'brightness(' + (effectLevel.value / 100 + 0.5) * 2;
     }
   };
+
+  window.effects = {
+    addDefaultEffect: addDefaultEffect,
+  };
+
 })();

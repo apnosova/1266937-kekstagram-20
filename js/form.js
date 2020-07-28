@@ -15,31 +15,19 @@
   var preview = document.querySelector('.img-upload__preview');
   var scaleInput = document.querySelector('.scale__control--value');
   var previewImage = preview.querySelector('img');
+  var defaultEffect = document.querySelector('input[id=effect-none]');
 
-  var defaultOpenEdit = function () {
-    scaleInput.value = 100 + ' % ';
-    preview.style.transform = 'scale(1)';
-    effectLevel.value = 100;
-    effectDepth.style.width = EFFECT + 'px';
-  };
-
-  var defaultCloseEdit = function () {
-    previewImage.className = 'effects__preview--none';
-    previewImage.style.filter = '';
-    pin.style.left = EFFECT + 'px';
-    effectDepth.style.width = EFFECT + 'px';
-    effectLevel.value = 100;
-    scaleInput.value = 100 + ' % ';
-    hashtagInput.value = '';
-    commentInput.value = '';
-  };
 
   // Загрузка изображения и показ формы редактирования
   var openEdit = function () {
     edit.classList.remove('hidden');
     document.querySelector('body').classList.add('modal-open');
+    window.effects.addDefaultEffect();
     document.addEventListener('keydown', onEditEscPress);
-    defaultOpenEdit();
+    scaleInput.value = 100 + ' % ';
+    preview.style.transform = 'scale(1)';
+    effectLevel.value = 100;
+    effectDepth.style.width = EFFECT + 'px';
     form.addEventListener('submit', onFormSubmit);
   };
 
@@ -48,7 +36,15 @@
     document.querySelector('body').classList.remove('modal-open');
     document.removeEventListener('keydown', onEditEscPress);
     uploadFile.value = '';
-    defaultCloseEdit();
+    previewImage.className = 'effects__preview--none';
+    defaultEffect.checked = true;
+    previewImage.style.filter = '';
+    pin.style.left = EFFECT + 'px';
+    effectDepth.style.width = EFFECT + 'px';
+    effectLevel.value = 100;
+    scaleInput.value = 100 + ' % ';
+    hashtagInput.value = '';
+    commentInput.value = '';
   };
 
   var onEditEscPress = function (evt) {

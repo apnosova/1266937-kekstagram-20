@@ -22,7 +22,7 @@
   var openEdit = function () {
     edit.classList.remove('hidden');
     document.querySelector('body').classList.add('modal-open');
-    window.effects.addDefaultEffect();
+    window.effects.hideSliderOnDefault();
     document.addEventListener('keydown', onEditEscPress);
     scaleInput.value = 100 + ' % ';
     preview.style.transform = 'scale(1)';

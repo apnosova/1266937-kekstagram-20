@@ -24,7 +24,7 @@
   };
 
   // При выборе эффекта «Оригинал» слайдер скрывается
-  var addDefaultEffect = function () {
+  var hideSliderOnDefault = function () {
     if (defaultEffect.checked) {
       slider.classList.add('hidden');
       previewImage.style.filter = '';
@@ -37,8 +37,7 @@
   var onEffectChange = function (evt) {
     var selectedEffect = 'effects__preview--' + evt.target.value;
     previewImage.className = selectedEffect;
-
-    addDefaultEffect();
+    hideSliderOnDefault();
 
     previewImage.style.filter = classNameToEffect[selectedEffect];
 
@@ -117,7 +116,7 @@
   };
 
   window.effects = {
-    addDefaultEffect: addDefaultEffect,
+    hideSliderOnDefault: hideSliderOnDefault,
   };
 
 })();

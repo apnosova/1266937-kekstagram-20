@@ -11,8 +11,16 @@
   var commentInput = document.querySelector('.text__description');
 
   // Валидация хэш-тегов
+
+  // Удаление пустых строк из массива
+  var filterNotEmptyElements = function (value) {
+
+    return value !== '';
+  };
+
   hashtagInput.addEventListener('input', function () {
-    var hashtags = window.util.splitString(hashtagInput.value, ' ');
+    var splittedHashtags = window.util.splitString(hashtagInput.value, ' ');
+    var hashtags = splittedHashtags.filter(filterNotEmptyElements);
     var uniqueHashtags = [];
 
     // Хэш-теги необязательны
@@ -27,13 +35,14 @@
       var isHashtag = reHashtag.test(hashtags[i]);
 
       if (!isHashtag || hashtags[i].length < MIN_HASHTAG_SYMBOLS) {
-        hashtagInput.setCustomValidity('Хэш-тег начинается с символа # и не может состоять только из одной #. Строка после решётки должна состоять только из букв, чисел и символа подчеркивания. Хэш-теги разделяются одним пробелом.');
+        hashtagInput.setCustomValidity('Хэш-тег начинается с символа # и не может состоять только из одной #. Строка после решётки должна состоять только из букв и чисел. Хэш-теги разделяются пробелами.');
         hashtagInput.style.boxShadow = 'inset 0 0 0 5px red';
         return;
       } else {
         hashtagInput.setCustomValidity('');
         hashtagInput.style.boxShadow = 'none';
       }
+
 
       if (hashtags[i].length > MAX_HASHTAG_SYMBOLS) {
         hashtagInput.setCustomValidity('Максимальная длина одного хэш-тега 20 симв.');
@@ -52,12 +61,15 @@
       }
     }
 
+
     if (hashtags.length > MAX_HASHTAGS) {
       hashtagInput.setCustomValidity('Нельзя указать больше пяти хэш-тегов.');
       hashtagInput.style.boxShadow = 'inset 0 0 0 5px red';
       return;
     }
+
   });
+
 
   // Валидация комментариев
   commentInput.addEventListener('input', function () {
@@ -71,3 +83,4 @@
     }
   });
 })();
+

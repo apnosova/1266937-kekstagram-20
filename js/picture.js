@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var MAX_PICTURES = 10;
+
   var picturesList = document.querySelector('.pictures');
   var pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
   var filters = document.querySelector('.img-filters');
@@ -67,7 +69,6 @@
 
   // Случайные = 10 случайных неповторяющихся фотографий
   var getRandomPictures = function () {
-    var MAX_PICTURES = 10;
     // сохранить исходный массив
     var copy = pictures.slice();
     var shufflePictures = window.util.shuffle(copy);
